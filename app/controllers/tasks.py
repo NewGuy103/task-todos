@@ -12,7 +12,7 @@ from PySide6.QtCore import QAbstractTableModel, QModelIndex, QObject, Qt, Signal
 from PySide6.QtGui import QAction, QIcon, QStandardItem, QStandardItemModel
 from PySide6.QtWidgets import QDialog, QHeaderView, QMenu, QMessageBox, QDialogButtonBox, QInputDialog
 
-from ..models import SubjectTask, EditedSubjectTask, EditedTaskWithID
+from ..models import SubjectTask, EditedSubjectTask, EditedTaskWithID, SortByComboBoxEnum, SortAndFilterState
 from ..ui.add_task_dialog import Ui_AddTaskDialog
 
 if typing.TYPE_CHECKING:
@@ -25,6 +25,7 @@ logger: logging.Logger = logging.getLogger("task-todos")
 class EmitDialogInfoAs(StrEnum):
     add = 'add'
     edit = 'edit'
+
 
 
 class TaskTodosTableModel(QAbstractTableModel):
@@ -134,10 +135,10 @@ class TaskTodosController(QObject):
         self.subject_ctrl: SubjectItemController = SubjectItemController(self)
         self.task_ctrl: TasksItemController = TasksItemController(self)
 
+        self.sort_filter_ctrl: SortAndFilterController = SortAndFilterController(self)
         self.setup()
 
     def setup(self):
-        self.ui.filterBySubjectComboBox.addItem("All Subjects")
         self.ui.filterBySubjectComboBox.addItems(self.app_data.subjects)
 
         self.subject_ctrl.subjectAdded.connect(lambda subject: self.ui.filterBySubjectComboBox.addItem(subject))
@@ -146,7 +147,10 @@ class TaskTodosController(QObject):
         self.ui.actionAdd_subject.triggered.connect(self.subject_ctrl.add_subject)
         self.ui.actionRemove_subject.triggered.connect(self.subject_ctrl.remove_subject)
 
-        self.ui.filterBySubjectComboBox.currentIndexChanged.connect(lambda idx: print("Changed", idx))
+        self.sort_filter_ctrl.reloadModelRequested.connect(self.task_ctrl.reload_model)
+        self.task_ctrl.updateSortAndFilterRequested.connect(self.sort_filter_ctrl.reload_tasks)
+        
+        self.ui.filterByAllSubjectsCheckBox.setChecked(True)
 
 
 class SubjectItemController(QObject):
@@ -206,6 +210,8 @@ class SubjectItemController(QObject):
 
 
 class TasksItemController(QObject):
+    updateSortAndFilterRequested = Signal()
+
     def __init__(self, ctrl_parent: 'TaskTodosController'):
         super().__init__(ctrl_parent)
         self.ctrl_parent = ctrl_parent
@@ -238,6 +244,11 @@ class TasksItemController(QObject):
 
         self.model.load_tasks(self.app_data.tasks)
 
+    @Slot(list)
+    def reload_model(self, tasks: list[SubjectTask]):
+        self.model.load_tasks(tasks)
+        logger.info("Reloaded model")
+    
     @Slot()
     def add_task_triggered(self):
         if not self.app_data.subjects:
@@ -262,6 +273,8 @@ class TasksItemController(QObject):
 
         self.app_data.save_settings()
         self.model.add_task(new_task)
+
+        self.updateSortAndFilterRequested.emit()
     
     @Slot()
     def remove_task_triggered(self):
@@ -286,6 +299,7 @@ class TasksItemController(QObject):
         self.app_data.save_settings()
 
         self.model.delete_task(index)
+        self.updateSortAndFilterRequested.emit()
     
     @Slot()
     def complete_task_triggered(self):
@@ -349,6 +363,91 @@ class TasksItemController(QObject):
         self.app_data.save_settings()
         self.model.update_task(index, edited_task)
 
+        self.updateSortAndFilterRequested.emit()
+
+
+class SortAndFilterController(QObject):
+    reloadModelRequested = Signal(list)  # list[SubjectTask]
+
+    def __init__(self, ctrl_parent: 'TaskTodosController'):
+        super().__init__(ctrl_parent)
+        self.ctrl_parent = ctrl_parent
+        self.mw_parent = ctrl_parent.mw_parent
+
+        self.ui = ctrl_parent.ui
+        self.app_data = ctrl_parent.app_data
+
+        self._sort_filter_state: SortAndFilterState = SortAndFilterState()
+        self.setup()
+
+    def setup(self):
+        self.ui.filterBySubjectComboBox.currentIndexChanged.connect(self.change_subject_filter)
+        self.ui.filterByAllSubjectsCheckBox.toggled.connect(self.filter_all_subjects_toggled)
+    
+        self.ui.sortByComboBox.currentIndexChanged.connect(self.change_sorting_rule)
+
+    @Slot(bool)
+    def filter_all_subjects_toggled(self, checked: bool):
+        if checked:
+            self._sort_filter_state.include_all_subjects = True
+            self._sort_filter_state.subject_filter = None
+
+            self.ui.filterBySubjectComboBox.setEnabled(False)
+        else:
+            subject_idx = self.ui.filterBySubjectComboBox.currentIndex()
+            subject: str = self.app_data.subjects[subject_idx]
+
+            self._sort_filter_state.subject_filter = subject
+            self._sort_filter_state.include_all_subjects = False
+
+            self.ui.filterBySubjectComboBox.setEnabled(True)
+        
+        self._emit_tasks()
+    
+    @Slot(int)
+    def change_subject_filter(self, subject_idx: int):
+        subject: str = self.app_data.subjects[subject_idx]
+        self._sort_filter_state.subject_filter = subject
+
+        self._emit_tasks()
+    
+    @Slot(int)
+    def change_sorting_rule(self, index: int):
+        self._sort_filter_state.sort_filter = index
+        self._emit_tasks()
+    
+    @Slot()
+    def reload_tasks(self):
+        self._emit_tasks()
+    
+    def _emit_tasks(self):
+        state = self._sort_filter_state
+
+        if not state.include_all_subjects and state.subject_filter is not None:
+            tasks = self._get_tasks_by_subject(state.subject_filter)
+        else:
+            tasks = self.app_data.tasks
+
+        match self._sort_filter_state.sort_filter:
+            case SortByComboBoxEnum.closest_to_deadline:
+                tasks_sorted = sorted(tasks, key=lambda task: task.deadline)
+            case SortByComboBoxEnum.farthest_to_deadline:
+                tasks_sorted = sorted(tasks, key=lambda task: task.deadline, reverse=True)
+            case SortByComboBoxEnum.subjects_a_to_z:
+                tasks_sorted = sorted(tasks, key=lambda task: task.subject)
+        
+        self.reloadModelRequested.emit(tasks_sorted)
+    
+    def _get_tasks_by_subject(self, subject: str):
+        tasks: list[SubjectTask] = []
+
+        for task in self.app_data.tasks:
+            if task.subject != subject:
+                continue
+            tasks.append(task)
+        
+        return tasks
+
 
 class TaskInfoDialog(QDialog):
     addTaskRequested = Signal(EditedSubjectTask)
@@ -382,6 +481,7 @@ class TaskInfoDialog(QDialog):
         self.ui.deadlineDateTimeEdit.setDateTime(qt_date)
         self.ui.taskPlainTextEdit.setPlainText(data.task)
 
+        self.ui.subjectComboBox.setCurrentText(data.subject)
         self._data = data
 
     def accept(self):

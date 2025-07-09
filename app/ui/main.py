@@ -16,11 +16,11 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QIcon, QImage, QKeySequence, QLinearGradient,
     QPainter, QPalette, QPixmap, QRadialGradient,
     QTransform)
-from PySide6.QtWidgets import (QAbstractItemView, QApplication, QComboBox, QFrame,
-    QHBoxLayout, QHeaderView, QLabel, QMainWindow,
-    QMenu, QMenuBar, QPushButton, QSizePolicy,
-    QSpacerItem, QStackedWidget, QStatusBar, QTableView,
-    QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QAbstractItemView, QApplication, QCheckBox, QComboBox,
+    QFrame, QHBoxLayout, QHeaderView, QLabel,
+    QMainWindow, QMenu, QMenuBar, QPushButton,
+    QSizePolicy, QSpacerItem, QStackedWidget, QStatusBar,
+    QTableView, QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -115,6 +115,11 @@ class Ui_MainWindow(object):
         self.filterBySubjectComboBox.setSizePolicy(sizePolicy1)
 
         self.horizontalLayout_4.addWidget(self.filterBySubjectComboBox)
+
+        self.filterByAllSubjectsCheckBox = QCheckBox(self.filterBySubjectWidget)
+        self.filterByAllSubjectsCheckBox.setObjectName(u"filterByAllSubjectsCheckBox")
+
+        self.horizontalLayout_4.addWidget(self.filterByAllSubjectsCheckBox)
 
 
         self.horizontalLayout_2.addWidget(self.filterBySubjectWidget)
@@ -214,6 +219,7 @@ class Ui_MainWindow(object):
         self.sortByComboBox.setItemText(2, QCoreApplication.translate("MainWindow", u"Subjects - A-Z", None))
 
         self.filterBySubjectLabel.setText(QCoreApplication.translate("MainWindow", u"Filter subjects:", None))
+        self.filterByAllSubjectsCheckBox.setText(QCoreApplication.translate("MainWindow", u"All subjects", None))
         self.addTaskButton.setText(QCoreApplication.translate("MainWindow", u"Add task", None))
         self.removeTaskButton.setText(QCoreApplication.translate("MainWindow", u"Remove task", None))
         self.completeTaskButton.setText(QCoreApplication.translate("MainWindow", u"Mark task completed", None))
