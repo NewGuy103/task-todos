@@ -1,5 +1,6 @@
 import sys
 import traceback
+import webbrowser
 
 from PySide6.QtGui import QCloseEvent
 from PySide6.QtCore import QTimer
@@ -50,6 +51,11 @@ class MainWindow(QMainWindow):
         header.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
         header.setStretchLastSection(True)
 
+        self.ui.actionHow_to_use.triggered.connect(lambda: webbrowser.open('https://newguy103.github.io/task-todos/guide/'))
+        self.ui.actionSource_code.triggered.connect(
+            lambda: webbrowser.open('https://github.com/newguy103/task-todos')
+        )
+        
         self.todos_ctrl = TaskTodosController(self)
     
     def closeEvent(self, event: QCloseEvent):
