@@ -46,7 +46,11 @@
          </widget>
         </item>
         <item row="1" column="1">
-         <widget class="QDateTimeEdit" name="deadlineDateTimeEdit"/>
+         <widget class="QDateTimeEdit" name="deadlineDateTimeEdit">
+          <property name="displayFormat">
+           <string>M/d/yy h:mm:ss Ap</string>
+          </property>
+         </widget>
         </item>
         <item row="2" column="0">
          <widget class="QLabel" name="taskLabel">

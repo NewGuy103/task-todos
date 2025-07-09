@@ -91,6 +91,7 @@ class Ui_AddTaskDialog(object):
         AddTaskDialog.setWindowTitle(QCoreApplication.translate("AddTaskDialog", u"Task to-dos - Add task", None))
         self.subjectLabel.setText(QCoreApplication.translate("AddTaskDialog", u"Subject:", None))
         self.deadlineLabel.setText(QCoreApplication.translate("AddTaskDialog", u"Deadline:", None))
+        self.deadlineDateTimeEdit.setDisplayFormat(QCoreApplication.translate("AddTaskDialog", u"M/d/yy h:mm:ss\u202fAp", None))
         self.taskLabel.setText(QCoreApplication.translate("AddTaskDialog", u"Task:", None))
     # retranslateUi
 

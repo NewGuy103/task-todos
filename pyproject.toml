@@ -10,3 +10,9 @@ dependencies = [
     "pydantic-settings>=2.10.1",
     "pyside6>=6.9.1",
 ]
+
+[dependency-groups]
+dev = [
+    "mkdocs>=1.6.1",
+    "mkdocs-material>=9.6.15",
+]

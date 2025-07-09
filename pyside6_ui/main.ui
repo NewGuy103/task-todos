@@ -123,6 +123,16 @@
                   <verstretch>0</verstretch>
                  </sizepolicy>
                 </property>
+                <property name="sizeAdjustPolicy">
+                 <enum>QComboBox::SizeAdjustPolicy::AdjustToContents</enum>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="filterByAllSubjectsCheckBox">
+                <property name="text">
+                 <string>All subjects</string>
+                </property>
                </widget>
               </item>
              </layout>
@@ -174,6 +184,9 @@
              <property name="text">
               <string>Add task</string>
              </property>
+             <property name="icon">
+              <iconset theme="QIcon::ThemeIcon::ListAdd"/>
+             </property>
             </widget>
            </item>
            <item>
@@ -181,12 +194,18 @@
              <property name="text">
               <string>Remove task</string>
              </property>
+             <property name="icon">
+              <iconset theme="QIcon::ThemeIcon::ListRemove"/>
+             </property>
             </widget>
            </item>
            <item>
             <widget class="QPushButton" name="completeTaskButton">
              <property name="text">
               <string>Mark task completed</string>
+             </property>
+             <property name="icon">
+              <iconset theme="QIcon::ThemeIcon::GoUp"/>
              </property>
             </widget>
            </item>
@@ -229,6 +248,7 @@
      <string>Help</string>
     </property>
     <addaction name="actionHow_to_use"/>
+    <addaction name="actionSource_code"/>
    </widget>
    <addaction name="menuDeadlines"/>
    <addaction name="menuSubject"/>
@@ -236,26 +256,41 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionAdd_task">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::ListAdd"/>
+   </property>
    <property name="text">
     <string>Add task</string>
    </property>
   </action>
   <action name="actionRemove_task">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::ListRemove"/>
+   </property>
    <property name="text">
     <string>Remove task</string>
    </property>
   </action>
   <action name="actionAdd_subject">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::ListAdd"/>
+   </property>
    <property name="text">
     <string>Add subject</string>
    </property>
   </action>
   <action name="actionRemove_subject">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::ListRemove"/>
+   </property>
    <property name="text">
     <string>Remove subject</string>
    </property>
   </action>
   <action name="actionHow_to_use">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::HelpFaq"/>
+   </property>
    <property name="text">
     <string>How to use</string>
    </property>
@@ -266,13 +301,27 @@
    </property>
   </action>
   <action name="actionMark_task_completed">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::GoUp"/>
+   </property>
    <property name="text">
     <string>Mark task completed</string>
    </property>
   </action>
   <action name="actionEdit_task">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::DocumentProperties"/>
+   </property>
    <property name="text">
     <string>Edit task</string>
+   </property>
+  </action>
+  <action name="actionSource_code">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::HelpAbout"/>
+   </property>
+   <property name="text">
+    <string>Source code</string>
    </property>
   </action>
  </widget>

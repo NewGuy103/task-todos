@@ -1,16 +1,12 @@
 import logging
-import traceback
 import typing
 import uuid
 
 from datetime import datetime, timezone
-from functools import partial
 from enum import StrEnum
 
-from pydantic import TypeAdapter, AnyUrl, ValidationError
 from PySide6.QtCore import QAbstractTableModel, QModelIndex, QObject, Qt, Signal, Slot, QDateTime
-from PySide6.QtGui import QAction, QIcon, QStandardItem, QStandardItemModel
-from PySide6.QtWidgets import QDialog, QHeaderView, QMenu, QMessageBox, QDialogButtonBox, QInputDialog
+from PySide6.QtWidgets import QDialog, QMessageBox, QInputDialog
 
 from ..models import SubjectTask, EditedSubjectTask, EditedTaskWithID, SortByComboBoxEnum, SortAndFilterState
 from ..ui.add_task_dialog import Ui_AddTaskDialog
@@ -51,7 +47,8 @@ class TaskTodosTableModel(QAbstractTableModel):
         if role == Qt.ItemDataRole.DisplayRole:
             value = self._display_data[index.row()][index.column()]
             if isinstance(value, datetime):
-                return value.strftime("%x %X")
+                local_value = value.astimezone()
+                return local_value.strftime("%x %X")
             
             if isinstance(value, bool):
                 if value:
@@ -141,7 +138,7 @@ class TaskTodosController(QObject):
     def setup(self):
         self.ui.filterBySubjectComboBox.addItems(self.app_data.subjects)
 
-        self.subject_ctrl.subjectAdded.connect(lambda subject: self.ui.filterBySubjectComboBox.addItem(subject))
+        self.subject_ctrl.subjectAdded.connect(self.subject_added)
         self.subject_ctrl.subjectRemoved.connect(self.ui.filterBySubjectComboBox.removeItem)
 
         self.ui.actionAdd_subject.triggered.connect(self.subject_ctrl.add_subject)
@@ -151,6 +148,13 @@ class TaskTodosController(QObject):
         self.task_ctrl.updateSortAndFilterRequested.connect(self.sort_filter_ctrl.reload_tasks)
         
         self.ui.filterByAllSubjectsCheckBox.setChecked(True)
+    
+    @Slot()
+    def subject_added(self, subject: str):
+        self.ui.filterBySubjectComboBox.addItem(subject)
+
+        self.ui.filterBySubjectComboBox.adjustSize()
+        self.ui.filterBySubjectComboBox.updateGeometry()
 
 
 class SubjectItemController(QObject):
@@ -395,8 +399,11 @@ class SortAndFilterController(QObject):
             self.ui.filterBySubjectComboBox.setEnabled(False)
         else:
             subject_idx = self.ui.filterBySubjectComboBox.currentIndex()
-            subject: str = self.app_data.subjects[subject_idx]
-
+            if subject_idx != -1:
+                subject: str = self.app_data.subjects[subject_idx]
+            else:
+                subject: None = None
+            
             self._sort_filter_state.subject_filter = subject
             self._sort_filter_state.include_all_subjects = False
 
@@ -491,7 +498,7 @@ class TaskInfoDialog(QDialog):
         qt_deadline = self.ui.deadlineDateTimeEdit.dateTime()
         py_deadline: datetime = qt_deadline.toPython()
 
-        aware_deadline: datetime = py_deadline.replace(tzinfo=timezone.utc)
+        aware_deadline: datetime = py_deadline.astimezone(timezone.utc)
         data = EditedSubjectTask(
             subject=subject,
             deadline=aware_deadline,
