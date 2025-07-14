@@ -49,10 +49,10 @@ plugins = egldeviceintegrations,platforms,accessiblebridge,imageformats,platform
 [android]
 
 # path to pyside wheel
-wheel_pyside = PySide6-6.9.1-6.9.1-cp311-cp311-android_aarch64.whl
+wheel_pyside = pyside6-wheels/PySide6-6.9.1-6.9.1-cp311-cp311-android_aarch64.whl
 
 # path to shiboken wheel
-wheel_shiboken = shiboken6-6.9.1-6.9.1-cp311-cp311-android_aarch64.whl
+wheel_shiboken = pyside6-wheels/shiboken6-6.9.1-6.9.1-cp311-cp311-android_aarch64.whl
 
 # plugins to be copied to libs folder of the packaged application. comma separated
 plugins = platforms_qtforandroid

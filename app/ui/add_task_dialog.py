@@ -49,22 +49,32 @@ class Ui_AddTaskDialog(object):
         self.deadlineLabel = QLabel(self.mainDialogFrame)
         self.deadlineLabel.setObjectName(u"deadlineLabel")
 
-        self.formLayout.setWidget(1, QFormLayout.ItemRole.LabelRole, self.deadlineLabel)
+        self.formLayout.setWidget(2, QFormLayout.ItemRole.LabelRole, self.deadlineLabel)
 
         self.deadlineDateTimeEdit = QDateTimeEdit(self.mainDialogFrame)
         self.deadlineDateTimeEdit.setObjectName(u"deadlineDateTimeEdit")
 
-        self.formLayout.setWidget(1, QFormLayout.ItemRole.FieldRole, self.deadlineDateTimeEdit)
+        self.formLayout.setWidget(2, QFormLayout.ItemRole.FieldRole, self.deadlineDateTimeEdit)
 
         self.taskLabel = QLabel(self.mainDialogFrame)
         self.taskLabel.setObjectName(u"taskLabel")
 
-        self.formLayout.setWidget(2, QFormLayout.ItemRole.LabelRole, self.taskLabel)
+        self.formLayout.setWidget(3, QFormLayout.ItemRole.LabelRole, self.taskLabel)
 
         self.taskPlainTextEdit = QPlainTextEdit(self.mainDialogFrame)
         self.taskPlainTextEdit.setObjectName(u"taskPlainTextEdit")
 
-        self.formLayout.setWidget(2, QFormLayout.ItemRole.FieldRole, self.taskPlainTextEdit)
+        self.formLayout.setWidget(3, QFormLayout.ItemRole.FieldRole, self.taskPlainTextEdit)
+
+        self.categoryLabel = QLabel(self.mainDialogFrame)
+        self.categoryLabel.setObjectName(u"categoryLabel")
+
+        self.formLayout.setWidget(1, QFormLayout.ItemRole.LabelRole, self.categoryLabel)
+
+        self.categoryComboBox = QComboBox(self.mainDialogFrame)
+        self.categoryComboBox.setObjectName(u"categoryComboBox")
+
+        self.formLayout.setWidget(1, QFormLayout.ItemRole.FieldRole, self.categoryComboBox)
 
 
         self.verticalLayout_2.addLayout(self.formLayout)
@@ -93,5 +103,6 @@ class Ui_AddTaskDialog(object):
         self.deadlineLabel.setText(QCoreApplication.translate("AddTaskDialog", u"Deadline:", None))
         self.deadlineDateTimeEdit.setDisplayFormat(QCoreApplication.translate("AddTaskDialog", u"M/d/yy h:mm:ss\u202fAp", None))
         self.taskLabel.setText(QCoreApplication.translate("AddTaskDialog", u"Task:", None))
+        self.categoryLabel.setText(QCoreApplication.translate("AddTaskDialog", u"Category:", None))
     # retranslateUi
 

@@ -16,11 +16,13 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QIcon, QImage, QKeySequence, QLinearGradient,
     QPainter, QPalette, QPixmap, QRadialGradient,
     QTransform)
-from PySide6.QtWidgets import (QAbstractItemView, QApplication, QCheckBox, QComboBox,
+from PySide6.QtWidgets import (QAbstractButton, QAbstractItemView, QApplication, QCheckBox,
+    QComboBox, QDateTimeEdit, QDialogButtonBox, QFormLayout,
     QFrame, QHBoxLayout, QHeaderView, QLabel,
     QMainWindow, QMenu, QMenuBar, QPushButton,
-    QSizePolicy, QSpacerItem, QStackedWidget, QStatusBar,
-    QTableView, QVBoxLayout, QWidget)
+    QRadioButton, QSizePolicy, QSpacerItem, QStackedWidget,
+    QStatusBar, QTabWidget, QTableView, QVBoxLayout,
+    QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -59,6 +61,13 @@ class Ui_MainWindow(object):
         self.actionSource_code.setObjectName(u"actionSource_code")
         icon5 = QIcon(QIcon.fromTheme(QIcon.ThemeIcon.HelpAbout))
         self.actionSource_code.setIcon(icon5)
+        self.actionSorting_options = QAction(MainWindow)
+        self.actionSorting_options.setObjectName(u"actionSorting_options")
+        self.actionSorting_options.setIcon(icon4)
+        self.actionFiltering_options = QAction(MainWindow)
+        self.actionFiltering_options.setObjectName(u"actionFiltering_options")
+        icon6 = QIcon(QIcon.fromTheme(QIcon.ThemeIcon.EditFind))
+        self.actionFiltering_options.setIcon(icon6)
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.verticalLayout = QVBoxLayout(self.centralwidget)
@@ -76,77 +85,6 @@ class Ui_MainWindow(object):
         self.tasksLabel.setFont(font)
 
         self.verticalLayout_2.addWidget(self.tasksLabel)
-
-        self.sortAndFilterFrame = QFrame(self.mainPage)
-        self.sortAndFilterFrame.setObjectName(u"sortAndFilterFrame")
-        self.sortAndFilterFrame.setFrameShape(QFrame.Shape.StyledPanel)
-        self.sortAndFilterFrame.setFrameShadow(QFrame.Shadow.Raised)
-        self.horizontalLayout_2 = QHBoxLayout(self.sortAndFilterFrame)
-        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.horizontalLayout_2.setContentsMargins(0, 6, 0, 6)
-        self.sortByWidget = QWidget(self.sortAndFilterFrame)
-        self.sortByWidget.setObjectName(u"sortByWidget")
-        self.horizontalLayout_3 = QHBoxLayout(self.sortByWidget)
-        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.sortByLabel = QLabel(self.sortByWidget)
-        self.sortByLabel.setObjectName(u"sortByLabel")
-        sizePolicy = QSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Preferred)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.sortByLabel.sizePolicy().hasHeightForWidth())
-        self.sortByLabel.setSizePolicy(sizePolicy)
-
-        self.horizontalLayout_3.addWidget(self.sortByLabel)
-
-        self.sortByComboBox = QComboBox(self.sortByWidget)
-        self.sortByComboBox.addItem("")
-        self.sortByComboBox.addItem("")
-        self.sortByComboBox.addItem("")
-        self.sortByComboBox.setObjectName(u"sortByComboBox")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Fixed)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.sortByComboBox.sizePolicy().hasHeightForWidth())
-        self.sortByComboBox.setSizePolicy(sizePolicy1)
-
-        self.horizontalLayout_3.addWidget(self.sortByComboBox)
-
-
-        self.horizontalLayout_2.addWidget(self.sortByWidget)
-
-        self.filterBySubjectWidget = QWidget(self.sortAndFilterFrame)
-        self.filterBySubjectWidget.setObjectName(u"filterBySubjectWidget")
-        self.horizontalLayout_4 = QHBoxLayout(self.filterBySubjectWidget)
-        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
-        self.filterBySubjectLabel = QLabel(self.filterBySubjectWidget)
-        self.filterBySubjectLabel.setObjectName(u"filterBySubjectLabel")
-        sizePolicy.setHeightForWidth(self.filterBySubjectLabel.sizePolicy().hasHeightForWidth())
-        self.filterBySubjectLabel.setSizePolicy(sizePolicy)
-
-        self.horizontalLayout_4.addWidget(self.filterBySubjectLabel)
-
-        self.filterBySubjectComboBox = QComboBox(self.filterBySubjectWidget)
-        self.filterBySubjectComboBox.setObjectName(u"filterBySubjectComboBox")
-        sizePolicy1.setHeightForWidth(self.filterBySubjectComboBox.sizePolicy().hasHeightForWidth())
-        self.filterBySubjectComboBox.setSizePolicy(sizePolicy1)
-        self.filterBySubjectComboBox.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
-
-        self.horizontalLayout_4.addWidget(self.filterBySubjectComboBox)
-
-        self.filterByAllSubjectsCheckBox = QCheckBox(self.filterBySubjectWidget)
-        self.filterByAllSubjectsCheckBox.setObjectName(u"filterByAllSubjectsCheckBox")
-
-        self.horizontalLayout_4.addWidget(self.filterByAllSubjectsCheckBox)
-
-
-        self.horizontalLayout_2.addWidget(self.filterBySubjectWidget)
-
-        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-
-        self.horizontalLayout_2.addItem(self.horizontalSpacer)
-
-
-        self.verticalLayout_2.addWidget(self.sortAndFilterFrame)
 
         self.tasksTableView = QTableView(self.mainPage)
         self.tasksTableView.setObjectName(u"tasksTableView")
@@ -185,6 +123,238 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.addWidget(self.taskOptionsFrame)
 
         self.mainStackedWidget.addWidget(self.mainPage)
+        self.sortingRulesPage = QWidget()
+        self.sortingRulesPage.setObjectName(u"sortingRulesPage")
+        self.verticalLayout_3 = QVBoxLayout(self.sortingRulesPage)
+        self.verticalLayout_3.setObjectName(u"verticalLayout_3")
+        self.sortAndFilterTabWidget = QTabWidget(self.sortingRulesPage)
+        self.sortAndFilterTabWidget.setObjectName(u"sortAndFilterTabWidget")
+        self.sortingTab = QWidget()
+        self.sortingTab.setObjectName(u"sortingTab")
+        self.horizontalLayout_2 = QHBoxLayout(self.sortingTab)
+        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
+        self.sortOptionFormLayout = QFormLayout()
+        self.sortOptionFormLayout.setObjectName(u"sortOptionFormLayout")
+        self.sortingModeLabel = QLabel(self.sortingTab)
+        self.sortingModeLabel.setObjectName(u"sortingModeLabel")
+
+        self.sortOptionFormLayout.setWidget(0, QFormLayout.ItemRole.LabelRole, self.sortingModeLabel)
+
+        self.sortingModeComboBox = QComboBox(self.sortingTab)
+        self.sortingModeComboBox.addItem("")
+        self.sortingModeComboBox.addItem("")
+        self.sortingModeComboBox.addItem("")
+        self.sortingModeComboBox.setObjectName(u"sortingModeComboBox")
+
+        self.sortOptionFormLayout.setWidget(0, QFormLayout.ItemRole.FieldRole, self.sortingModeComboBox)
+
+        self.sortingOptionLabel = QLabel(self.sortingTab)
+        self.sortingOptionLabel.setObjectName(u"sortingOptionLabel")
+
+        self.sortOptionFormLayout.setWidget(1, QFormLayout.ItemRole.LabelRole, self.sortingOptionLabel)
+
+        self.sortingOptionComboBox = QComboBox(self.sortingTab)
+        self.sortingOptionComboBox.setObjectName(u"sortingOptionComboBox")
+        self.sortingOptionComboBox.setEnabled(False)
+
+        self.sortOptionFormLayout.setWidget(1, QFormLayout.ItemRole.FieldRole, self.sortingOptionComboBox)
+
+
+        self.horizontalLayout_2.addLayout(self.sortOptionFormLayout)
+
+        self.sortAndFilterTabWidget.addTab(self.sortingTab, "")
+        self.filterRules = QWidget()
+        self.filterRules.setObjectName(u"filterRules")
+        self.verticalLayout_4 = QVBoxLayout(self.filterRules)
+        self.verticalLayout_4.setObjectName(u"verticalLayout_4")
+        self.filterOptionsFormLayout = QFormLayout()
+        self.filterOptionsFormLayout.setObjectName(u"filterOptionsFormLayout")
+        self.subjectFilterLabel = QLabel(self.filterRules)
+        self.subjectFilterLabel.setObjectName(u"subjectFilterLabel")
+
+        self.filterOptionsFormLayout.setWidget(0, QFormLayout.ItemRole.LabelRole, self.subjectFilterLabel)
+
+        self.subjectFilterComboBox = QComboBox(self.filterRules)
+        self.subjectFilterComboBox.setObjectName(u"subjectFilterComboBox")
+        self.subjectFilterComboBox.setEnabled(False)
+
+        self.filterOptionsFormLayout.setWidget(0, QFormLayout.ItemRole.FieldRole, self.subjectFilterComboBox)
+
+        self.categoryFilterLabel = QLabel(self.filterRules)
+        self.categoryFilterLabel.setObjectName(u"categoryFilterLabel")
+
+        self.filterOptionsFormLayout.setWidget(1, QFormLayout.ItemRole.LabelRole, self.categoryFilterLabel)
+
+        self.categoryFilterComboBox = QComboBox(self.filterRules)
+        self.categoryFilterComboBox.setObjectName(u"categoryFilterComboBox")
+        self.categoryFilterComboBox.setEnabled(False)
+
+        self.filterOptionsFormLayout.setWidget(1, QFormLayout.ItemRole.FieldRole, self.categoryFilterComboBox)
+
+        self.deadlineFilterLabel = QLabel(self.filterRules)
+        self.deadlineFilterLabel.setObjectName(u"deadlineFilterLabel")
+
+        self.filterOptionsFormLayout.setWidget(2, QFormLayout.ItemRole.LabelRole, self.deadlineFilterLabel)
+
+        self.deadlineFilterWidget = QWidget(self.filterRules)
+        self.deadlineFilterWidget.setObjectName(u"deadlineFilterWidget")
+        self.verticalLayout_5 = QVBoxLayout(self.deadlineFilterWidget)
+        self.verticalLayout_5.setObjectName(u"verticalLayout_5")
+        self.verticalLayout_5.setContentsMargins(0, 0, 0, 0)
+        self.formLayout = QFormLayout()
+        self.formLayout.setObjectName(u"formLayout")
+        self.notBeforeDeadlineLabel = QLabel(self.deadlineFilterWidget)
+        self.notBeforeDeadlineLabel.setObjectName(u"notBeforeDeadlineLabel")
+
+        self.formLayout.setWidget(1, QFormLayout.ItemRole.LabelRole, self.notBeforeDeadlineLabel)
+
+        self.notBeforeDeadlineDateTimeEdit = QDateTimeEdit(self.deadlineFilterWidget)
+        self.notBeforeDeadlineDateTimeEdit.setObjectName(u"notBeforeDeadlineDateTimeEdit")
+        self.notBeforeDeadlineDateTimeEdit.setEnabled(False)
+
+        self.formLayout.setWidget(1, QFormLayout.ItemRole.FieldRole, self.notBeforeDeadlineDateTimeEdit)
+
+        self.notAfterDeadlineLabel = QLabel(self.deadlineFilterWidget)
+        self.notAfterDeadlineLabel.setObjectName(u"notAfterDeadlineLabel")
+
+        self.formLayout.setWidget(2, QFormLayout.ItemRole.LabelRole, self.notAfterDeadlineLabel)
+
+        self.notAfterDeadlineDateTimeEdit = QDateTimeEdit(self.deadlineFilterWidget)
+        self.notAfterDeadlineDateTimeEdit.setObjectName(u"notAfterDeadlineDateTimeEdit")
+        self.notAfterDeadlineDateTimeEdit.setEnabled(False)
+
+        self.formLayout.setWidget(2, QFormLayout.ItemRole.FieldRole, self.notAfterDeadlineDateTimeEdit)
+
+        self.enableDeadlineFilterLabel = QLabel(self.deadlineFilterWidget)
+        self.enableDeadlineFilterLabel.setObjectName(u"enableDeadlineFilterLabel")
+
+        self.formLayout.setWidget(0, QFormLayout.ItemRole.LabelRole, self.enableDeadlineFilterLabel)
+
+        self.enableDeadlineFilterCheckBox = QCheckBox(self.deadlineFilterWidget)
+        self.enableDeadlineFilterCheckBox.setObjectName(u"enableDeadlineFilterCheckBox")
+
+        self.formLayout.setWidget(0, QFormLayout.ItemRole.FieldRole, self.enableDeadlineFilterCheckBox)
+
+
+        self.verticalLayout_5.addLayout(self.formLayout)
+
+
+        self.filterOptionsFormLayout.setWidget(2, QFormLayout.ItemRole.FieldRole, self.deadlineFilterWidget)
+
+        self.subjectFilterRulesLabel = QLabel(self.filterRules)
+        self.subjectFilterRulesLabel.setObjectName(u"subjectFilterRulesLabel")
+
+        self.filterOptionsFormLayout.setWidget(3, QFormLayout.ItemRole.LabelRole, self.subjectFilterRulesLabel)
+
+        self.subjectFilterRulesWidget = QWidget(self.filterRules)
+        self.subjectFilterRulesWidget.setObjectName(u"subjectFilterRulesWidget")
+        self.horizontalLayout_4 = QHBoxLayout(self.subjectFilterRulesWidget)
+        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
+        self.horizontalLayout_4.setContentsMargins(0, 0, 0, 0)
+        self.subjectFilterIncludeAllRadioButton = QRadioButton(self.subjectFilterRulesWidget)
+        self.subjectFilterIncludeAllRadioButton.setObjectName(u"subjectFilterIncludeAllRadioButton")
+
+        self.horizontalLayout_4.addWidget(self.subjectFilterIncludeAllRadioButton)
+
+        self.subjectFilterRulesFilterNormallyRadioButton = QRadioButton(self.subjectFilterRulesWidget)
+        self.subjectFilterRulesFilterNormallyRadioButton.setObjectName(u"subjectFilterRulesFilterNormallyRadioButton")
+
+        self.horizontalLayout_4.addWidget(self.subjectFilterRulesFilterNormallyRadioButton)
+
+        self.subjectFilterRulesDontIncludeRadioButton = QRadioButton(self.subjectFilterRulesWidget)
+        self.subjectFilterRulesDontIncludeRadioButton.setObjectName(u"subjectFilterRulesDontIncludeRadioButton")
+        self.subjectFilterRulesDontIncludeRadioButton.setChecked(True)
+
+        self.horizontalLayout_4.addWidget(self.subjectFilterRulesDontIncludeRadioButton)
+
+        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_4.addItem(self.horizontalSpacer_2)
+
+
+        self.filterOptionsFormLayout.setWidget(3, QFormLayout.ItemRole.FieldRole, self.subjectFilterRulesWidget)
+
+        self.categoryFilterRulesLabel = QLabel(self.filterRules)
+        self.categoryFilterRulesLabel.setObjectName(u"categoryFilterRulesLabel")
+
+        self.filterOptionsFormLayout.setWidget(4, QFormLayout.ItemRole.LabelRole, self.categoryFilterRulesLabel)
+
+        self.categoryFilterRulesWidget = QWidget(self.filterRules)
+        self.categoryFilterRulesWidget.setObjectName(u"categoryFilterRulesWidget")
+        self.horizontalLayout_5 = QHBoxLayout(self.categoryFilterRulesWidget)
+        self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
+        self.horizontalLayout_5.setContentsMargins(0, 0, 0, 0)
+        self.categoryFilterRulesIncludeAllRadioButton = QRadioButton(self.categoryFilterRulesWidget)
+        self.categoryFilterRulesIncludeAllRadioButton.setObjectName(u"categoryFilterRulesIncludeAllRadioButton")
+
+        self.horizontalLayout_5.addWidget(self.categoryFilterRulesIncludeAllRadioButton)
+
+        self.categoryFilterRulesFilterNormallyRadioButton = QRadioButton(self.categoryFilterRulesWidget)
+        self.categoryFilterRulesFilterNormallyRadioButton.setObjectName(u"categoryFilterRulesFilterNormallyRadioButton")
+
+        self.horizontalLayout_5.addWidget(self.categoryFilterRulesFilterNormallyRadioButton)
+
+        self.categoryFilterRulesDontIncludeRadioButton = QRadioButton(self.categoryFilterRulesWidget)
+        self.categoryFilterRulesDontIncludeRadioButton.setObjectName(u"categoryFilterRulesDontIncludeRadioButton")
+        self.categoryFilterRulesDontIncludeRadioButton.setChecked(True)
+
+        self.horizontalLayout_5.addWidget(self.categoryFilterRulesDontIncludeRadioButton)
+
+        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_5.addItem(self.horizontalSpacer_3)
+
+
+        self.filterOptionsFormLayout.setWidget(4, QFormLayout.ItemRole.FieldRole, self.categoryFilterRulesWidget)
+
+        self.completedTasksLabel = QLabel(self.filterRules)
+        self.completedTasksLabel.setObjectName(u"completedTasksLabel")
+
+        self.filterOptionsFormLayout.setWidget(5, QFormLayout.ItemRole.LabelRole, self.completedTasksLabel)
+
+        self.completedTasksWidget = QWidget(self.filterRules)
+        self.completedTasksWidget.setObjectName(u"completedTasksWidget")
+        self.horizontalLayout_3 = QHBoxLayout(self.completedTasksWidget)
+        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
+        self.horizontalLayout_3.setContentsMargins(0, 0, 0, 0)
+        self.filterCompletedTasksCompleteRadioButton = QRadioButton(self.completedTasksWidget)
+        self.filterCompletedTasksCompleteRadioButton.setObjectName(u"filterCompletedTasksCompleteRadioButton")
+
+        self.horizontalLayout_3.addWidget(self.filterCompletedTasksCompleteRadioButton)
+
+        self.filterCompletedTasksIncompleteRadioButton = QRadioButton(self.completedTasksWidget)
+        self.filterCompletedTasksIncompleteRadioButton.setObjectName(u"filterCompletedTasksIncompleteRadioButton")
+
+        self.horizontalLayout_3.addWidget(self.filterCompletedTasksIncompleteRadioButton)
+
+        self.filterCompletedTasksDontFilterRadioButton = QRadioButton(self.completedTasksWidget)
+        self.filterCompletedTasksDontFilterRadioButton.setObjectName(u"filterCompletedTasksDontFilterRadioButton")
+        self.filterCompletedTasksDontFilterRadioButton.setChecked(True)
+
+        self.horizontalLayout_3.addWidget(self.filterCompletedTasksDontFilterRadioButton)
+
+        self.horizontalSpacer_4 = QSpacerItem(317, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_3.addItem(self.horizontalSpacer_4)
+
+
+        self.filterOptionsFormLayout.setWidget(5, QFormLayout.ItemRole.FieldRole, self.completedTasksWidget)
+
+
+        self.verticalLayout_4.addLayout(self.filterOptionsFormLayout)
+
+        self.sortAndFilterTabWidget.addTab(self.filterRules, "")
+
+        self.verticalLayout_3.addWidget(self.sortAndFilterTabWidget)
+
+        self.sortAndFilterButtonBox = QDialogButtonBox(self.sortingRulesPage)
+        self.sortAndFilterButtonBox.setObjectName(u"sortAndFilterButtonBox")
+        self.sortAndFilterButtonBox.setStandardButtons(QDialogButtonBox.StandardButton.Apply|QDialogButtonBox.StandardButton.Discard|QDialogButtonBox.StandardButton.Reset)
+        self.sortAndFilterButtonBox.setCenterButtons(False)
+
+        self.verticalLayout_3.addWidget(self.sortAndFilterButtonBox)
+
+        self.mainStackedWidget.addWidget(self.sortingRulesPage)
 
         self.verticalLayout.addWidget(self.mainStackedWidget)
 
@@ -198,6 +368,8 @@ class Ui_MainWindow(object):
         self.menuSubject.setObjectName(u"menuSubject")
         self.menuHelp = QMenu(self.menubar)
         self.menuHelp.setObjectName(u"menuHelp")
+        self.menuSort_Filter = QMenu(self.menubar)
+        self.menuSort_Filter.setObjectName(u"menuSort_Filter")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
@@ -206,6 +378,7 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuDeadlines.menuAction())
         self.menubar.addAction(self.menuSubject.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
+        self.menubar.addAction(self.menuSort_Filter.menuAction())
         self.menuDeadlines.addAction(self.actionAdd_task)
         self.menuDeadlines.addAction(self.actionRemove_task)
         self.menuDeadlines.addAction(self.actionEdit_task)
@@ -214,10 +387,21 @@ class Ui_MainWindow(object):
         self.menuSubject.addAction(self.actionRemove_subject)
         self.menuHelp.addAction(self.actionHow_to_use)
         self.menuHelp.addAction(self.actionSource_code)
+        self.menuSort_Filter.addAction(self.actionSorting_options)
+        self.menuSort_Filter.addAction(self.actionFiltering_options)
 
         self.retranslateUi(MainWindow)
+        self.enableDeadlineFilterCheckBox.toggled.connect(self.notBeforeDeadlineDateTimeEdit.setEnabled)
+        self.enableDeadlineFilterCheckBox.toggled.connect(self.notAfterDeadlineDateTimeEdit.setEnabled)
+        self.subjectFilterRulesDontIncludeRadioButton.toggled.connect(self.subjectFilterComboBox.setDisabled)
+        self.subjectFilterIncludeAllRadioButton.toggled.connect(self.subjectFilterComboBox.setDisabled)
+        self.subjectFilterRulesFilterNormallyRadioButton.toggled.connect(self.subjectFilterComboBox.setEnabled)
+        self.categoryFilterRulesDontIncludeRadioButton.toggled.connect(self.categoryFilterComboBox.setDisabled)
+        self.categoryFilterRulesIncludeAllRadioButton.toggled.connect(self.categoryFilterComboBox.setDisabled)
+        self.categoryFilterRulesFilterNormallyRadioButton.toggled.connect(self.categoryFilterComboBox.setEnabled)
 
-        self.mainStackedWidget.setCurrentIndex(0)
+        self.mainStackedWidget.setCurrentIndex(1)
+        self.sortAndFilterTabWidget.setCurrentIndex(1)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -234,19 +418,43 @@ class Ui_MainWindow(object):
         self.actionMark_task_completed.setText(QCoreApplication.translate("MainWindow", u"Mark task completed", None))
         self.actionEdit_task.setText(QCoreApplication.translate("MainWindow", u"Edit task", None))
         self.actionSource_code.setText(QCoreApplication.translate("MainWindow", u"Source code", None))
+        self.actionSorting_options.setText(QCoreApplication.translate("MainWindow", u"Sorting Options", None))
+        self.actionFiltering_options.setText(QCoreApplication.translate("MainWindow", u"Filtering Options", None))
         self.tasksLabel.setText(QCoreApplication.translate("MainWindow", u"Upcoming tasks:", None))
-        self.sortByLabel.setText(QCoreApplication.translate("MainWindow", u"Sort by:", None))
-        self.sortByComboBox.setItemText(0, QCoreApplication.translate("MainWindow", u"Closest to deadline", None))
-        self.sortByComboBox.setItemText(1, QCoreApplication.translate("MainWindow", u"Farthest to deadline", None))
-        self.sortByComboBox.setItemText(2, QCoreApplication.translate("MainWindow", u"Subjects - A-Z", None))
-
-        self.filterBySubjectLabel.setText(QCoreApplication.translate("MainWindow", u"Filter subjects:", None))
-        self.filterByAllSubjectsCheckBox.setText(QCoreApplication.translate("MainWindow", u"All subjects", None))
         self.addTaskButton.setText(QCoreApplication.translate("MainWindow", u"Add task", None))
         self.removeTaskButton.setText(QCoreApplication.translate("MainWindow", u"Remove task", None))
         self.completeTaskButton.setText(QCoreApplication.translate("MainWindow", u"Mark task completed", None))
+        self.sortingModeLabel.setText(QCoreApplication.translate("MainWindow", u"Sorting Mode:", None))
+        self.sortingModeComboBox.setItemText(0, QCoreApplication.translate("MainWindow", u"Don't sort", None))
+        self.sortingModeComboBox.setItemText(1, QCoreApplication.translate("MainWindow", u"Deadline", None))
+        self.sortingModeComboBox.setItemText(2, QCoreApplication.translate("MainWindow", u"Alphabetical", None))
+
+        self.sortingOptionLabel.setText(QCoreApplication.translate("MainWindow", u"Sorting Option:", None))
+        self.sortAndFilterTabWidget.setTabText(self.sortAndFilterTabWidget.indexOf(self.sortingTab), QCoreApplication.translate("MainWindow", u"Sorting Options", None))
+        self.subjectFilterLabel.setText(QCoreApplication.translate("MainWindow", u"Subject Filter:", None))
+        self.categoryFilterLabel.setText(QCoreApplication.translate("MainWindow", u"Category Filter:", None))
+        self.deadlineFilterLabel.setText(QCoreApplication.translate("MainWindow", u"Deadline Filter:", None))
+        self.notBeforeDeadlineLabel.setText(QCoreApplication.translate("MainWindow", u"Not before:", None))
+        self.notBeforeDeadlineDateTimeEdit.setDisplayFormat(QCoreApplication.translate("MainWindow", u"M/d/yy h:mm:ss\u202fAp", None))
+        self.notAfterDeadlineLabel.setText(QCoreApplication.translate("MainWindow", u"Not after:", None))
+        self.notAfterDeadlineDateTimeEdit.setDisplayFormat(QCoreApplication.translate("MainWindow", u"M/d/yy h:mm:ss\u202fAp", None))
+        self.enableDeadlineFilterLabel.setText(QCoreApplication.translate("MainWindow", u"Enable deadline filter:", None))
+        self.subjectFilterRulesLabel.setText(QCoreApplication.translate("MainWindow", u"Subject Filter Rules:", None))
+        self.subjectFilterIncludeAllRadioButton.setText(QCoreApplication.translate("MainWindow", u"Include all", None))
+        self.subjectFilterRulesFilterNormallyRadioButton.setText(QCoreApplication.translate("MainWindow", u"Filter normally", None))
+        self.subjectFilterRulesDontIncludeRadioButton.setText(QCoreApplication.translate("MainWindow", u"Don't include", None))
+        self.categoryFilterRulesLabel.setText(QCoreApplication.translate("MainWindow", u"Category Filter Rules:", None))
+        self.categoryFilterRulesIncludeAllRadioButton.setText(QCoreApplication.translate("MainWindow", u"Include all", None))
+        self.categoryFilterRulesFilterNormallyRadioButton.setText(QCoreApplication.translate("MainWindow", u"Filter normally", None))
+        self.categoryFilterRulesDontIncludeRadioButton.setText(QCoreApplication.translate("MainWindow", u"Don't include", None))
+        self.completedTasksLabel.setText(QCoreApplication.translate("MainWindow", u"Filter Completed Tasks:", None))
+        self.filterCompletedTasksCompleteRadioButton.setText(QCoreApplication.translate("MainWindow", u"Complete", None))
+        self.filterCompletedTasksIncompleteRadioButton.setText(QCoreApplication.translate("MainWindow", u"Incomplete", None))
+        self.filterCompletedTasksDontFilterRadioButton.setText(QCoreApplication.translate("MainWindow", u"Don't filter", None))
+        self.sortAndFilterTabWidget.setTabText(self.sortAndFilterTabWidget.indexOf(self.filterRules), QCoreApplication.translate("MainWindow", u"Filtering Options", None))
         self.menuDeadlines.setTitle(QCoreApplication.translate("MainWindow", u"Tasks", None))
         self.menuSubject.setTitle(QCoreApplication.translate("MainWindow", u"Subjects", None))
         self.menuHelp.setTitle(QCoreApplication.translate("MainWindow", u"Help", None))
+        self.menuSort_Filter.setTitle(QCoreApplication.translate("MainWindow", u"Sort/Filter", None))
     # retranslateUi
 

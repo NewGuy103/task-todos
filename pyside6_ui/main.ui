@@ -18,7 +18,7 @@
     <item>
      <widget class="QStackedWidget" name="mainStackedWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="mainPage">
        <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -32,126 +32,6 @@
           <property name="text">
            <string>Upcoming tasks:</string>
           </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QFrame" name="sortAndFilterFrame">
-          <property name="frameShape">
-           <enum>QFrame::Shape::StyledPanel</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Shadow::Raised</enum>
-          </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_2">
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>6</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
-            <number>6</number>
-           </property>
-           <item>
-            <widget class="QWidget" name="sortByWidget" native="true">
-             <layout class="QHBoxLayout" name="horizontalLayout_3">
-              <item>
-               <widget class="QLabel" name="sortByLabel">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>Sort by:</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QComboBox" name="sortByComboBox">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <item>
-                 <property name="text">
-                  <string>Closest to deadline</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Farthest to deadline</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Subjects - A-Z</string>
-                 </property>
-                </item>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item>
-            <widget class="QWidget" name="filterBySubjectWidget" native="true">
-             <layout class="QHBoxLayout" name="horizontalLayout_4">
-              <item>
-               <widget class="QLabel" name="filterBySubjectLabel">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>Filter subjects:</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QComboBox" name="filterBySubjectComboBox">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="sizeAdjustPolicy">
-                 <enum>QComboBox::SizeAdjustPolicy::AdjustToContents</enum>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="filterByAllSubjectsCheckBox">
-                <property name="text">
-                 <string>All subjects</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer">
-             <property name="orientation">
-              <enum>Qt::Orientation::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
          </widget>
         </item>
         <item>
@@ -214,6 +94,376 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="sortingRulesPage">
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <widget class="QTabWidget" name="sortAndFilterTabWidget">
+          <property name="currentIndex">
+           <number>1</number>
+          </property>
+          <widget class="QWidget" name="sortingTab">
+           <attribute name="title">
+            <string>Sorting Options</string>
+           </attribute>
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <item>
+             <layout class="QFormLayout" name="sortOptionFormLayout">
+              <item row="0" column="0">
+               <widget class="QLabel" name="sortingModeLabel">
+                <property name="text">
+                 <string>Sorting Mode:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QComboBox" name="sortingModeComboBox">
+                <item>
+                 <property name="text">
+                  <string>Don't sort</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Deadline</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Alphabetical</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="sortingOptionLabel">
+                <property name="text">
+                 <string>Sorting Option:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QComboBox" name="sortingOptionComboBox">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="filterRules">
+           <attribute name="title">
+            <string>Filtering Options</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="verticalLayout_4">
+            <item>
+             <layout class="QFormLayout" name="filterOptionsFormLayout">
+              <item row="0" column="0">
+               <widget class="QLabel" name="subjectFilterLabel">
+                <property name="text">
+                 <string>Subject Filter:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QComboBox" name="subjectFilterComboBox">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="categoryFilterLabel">
+                <property name="text">
+                 <string>Category Filter:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QComboBox" name="categoryFilterComboBox">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="deadlineFilterLabel">
+                <property name="text">
+                 <string>Deadline Filter:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QWidget" name="deadlineFilterWidget" native="true">
+                <layout class="QVBoxLayout" name="verticalLayout_5">
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <layout class="QFormLayout" name="formLayout">
+                   <item row="1" column="0">
+                    <widget class="QLabel" name="notBeforeDeadlineLabel">
+                     <property name="text">
+                      <string>Not before:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="1">
+                    <widget class="QDateTimeEdit" name="notBeforeDeadlineDateTimeEdit">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
+                     <property name="displayFormat">
+                      <string>M/d/yy h:mm:ss Ap</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="0">
+                    <widget class="QLabel" name="notAfterDeadlineLabel">
+                     <property name="text">
+                      <string>Not after:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="1">
+                    <widget class="QDateTimeEdit" name="notAfterDeadlineDateTimeEdit">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
+                     <property name="displayFormat">
+                      <string>M/d/yy h:mm:ss Ap</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="0">
+                    <widget class="QLabel" name="enableDeadlineFilterLabel">
+                     <property name="text">
+                      <string>Enable deadline filter:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="1">
+                    <widget class="QCheckBox" name="enableDeadlineFilterCheckBox"/>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="subjectFilterRulesLabel">
+                <property name="text">
+                 <string>Subject Filter Rules:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QWidget" name="subjectFilterRulesWidget" native="true">
+                <layout class="QHBoxLayout" name="horizontalLayout_4">
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QRadioButton" name="subjectFilterIncludeAllRadioButton">
+                   <property name="text">
+                    <string>Include all</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRadioButton" name="subjectFilterRulesFilterNormallyRadioButton">
+                   <property name="text">
+                    <string>Filter normally</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRadioButton" name="subjectFilterRulesDontIncludeRadioButton">
+                   <property name="text">
+                    <string>Don't include</string>
+                   </property>
+                   <property name="checked">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_2">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="categoryFilterRulesLabel">
+                <property name="text">
+                 <string>Category Filter Rules:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="QWidget" name="categoryFilterRulesWidget" native="true">
+                <layout class="QHBoxLayout" name="horizontalLayout_5">
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QRadioButton" name="categoryFilterRulesIncludeAllRadioButton">
+                   <property name="text">
+                    <string>Include all</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRadioButton" name="categoryFilterRulesFilterNormallyRadioButton">
+                   <property name="text">
+                    <string>Filter normally</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRadioButton" name="categoryFilterRulesDontIncludeRadioButton">
+                   <property name="text">
+                    <string>Don't include</string>
+                   </property>
+                   <property name="checked">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_3">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item row="5" column="0">
+               <widget class="QLabel" name="completedTasksLabel">
+                <property name="text">
+                 <string>Filter Completed Tasks:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="1">
+               <widget class="QWidget" name="completedTasksWidget" native="true">
+                <layout class="QHBoxLayout" name="horizontalLayout_3">
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QRadioButton" name="filterCompletedTasksCompleteRadioButton">
+                   <property name="text">
+                    <string>Complete</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRadioButton" name="filterCompletedTasksIncompleteRadioButton">
+                   <property name="text">
+                    <string>Incomplete</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRadioButton" name="filterCompletedTasksDontFilterRadioButton">
+                   <property name="text">
+                    <string>Don't filter</string>
+                   </property>
+                   <property name="checked">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_4">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>317</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+        <item>
+         <widget class="QDialogButtonBox" name="sortAndFilterButtonBox">
+          <property name="standardButtons">
+           <set>QDialogButtonBox::StandardButton::Apply|QDialogButtonBox::StandardButton::Discard|QDialogButtonBox::StandardButton::Reset</set>
+          </property>
+          <property name="centerButtons">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -250,9 +500,17 @@
     <addaction name="actionHow_to_use"/>
     <addaction name="actionSource_code"/>
    </widget>
+   <widget class="QMenu" name="menuSort_Filter">
+    <property name="title">
+     <string>Sort/Filter</string>
+    </property>
+    <addaction name="actionSorting_options"/>
+    <addaction name="actionFiltering_options"/>
+   </widget>
    <addaction name="menuDeadlines"/>
    <addaction name="menuSubject"/>
    <addaction name="menuHelp"/>
+   <addaction name="menuSort_Filter"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionAdd_task">
@@ -324,7 +582,152 @@
     <string>Source code</string>
    </property>
   </action>
+  <action name="actionSorting_options">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::DocumentProperties"/>
+   </property>
+   <property name="text">
+    <string>Sorting Options</string>
+   </property>
+  </action>
+  <action name="actionFiltering_options">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::EditFind"/>
+   </property>
+   <property name="text">
+    <string>Filtering Options</string>
+   </property>
+  </action>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>enableDeadlineFilterCheckBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>notBeforeDeadlineDateTimeEdit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>314</x>
+     <y>146</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>343</x>
+     <y>171</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>enableDeadlineFilterCheckBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>notAfterDeadlineDateTimeEdit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>318</x>
+     <y>144</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>321</x>
+     <y>191</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>subjectFilterRulesDontIncludeRadioButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>subjectFilterComboBox</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>453</x>
+     <y>232</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>457</x>
+     <y>92</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>subjectFilterIncludeAllRadioButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>subjectFilterComboBox</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>244</x>
+     <y>232</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>228</x>
+     <y>78</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>subjectFilterRulesFilterNormallyRadioButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>subjectFilterComboBox</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>359</x>
+     <y>232</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>385</x>
+     <y>84</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>categoryFilterRulesDontIncludeRadioButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>categoryFilterComboBox</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>388</x>
+     <y>250</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>428</x>
+     <y>112</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>categoryFilterRulesIncludeAllRadioButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>categoryFilterComboBox</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>191</x>
+     <y>244</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>187</x>
+     <y>114</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>categoryFilterRulesFilterNormallyRadioButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>categoryFilterComboBox</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>284</x>
+     <y>246</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>276</x>
+     <y>116</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

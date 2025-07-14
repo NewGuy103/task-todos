@@ -2,13 +2,17 @@ import logging
 import typing
 import uuid
 
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from enum import StrEnum
 
 from PySide6.QtCore import QAbstractTableModel, QModelIndex, QObject, Qt, Signal, Slot, QDateTime
 from PySide6.QtWidgets import QDialog, QMessageBox, QInputDialog
 
-from ..models import SubjectTask, EditedSubjectTask, EditedTaskWithID, SortByComboBoxEnum, SortAndFilterState
+from ..models import (
+    DeadlineFilterState, FilterCompletedTasksEnum, FilterState, AlphabeticalSortingEnum, SortState, SortingModeEnum, SubjectTask, 
+    EditedSubjectTask, EditedTaskWithID, DeadlineSortingEnum, 
+    SortAndFilterState, BuiltinCategories
+)
 from ..ui.add_task_dialog import Ui_AddTaskDialog
 
 if typing.TYPE_CHECKING:
@@ -29,10 +33,10 @@ class TaskTodosTableModel(QAbstractTableModel):
         super().__init__(parent)
         self.todo_ctrl = parent
 
-        self._display_data: list[list[str | datetime]] = []
+        self._display_data: list[list] = []
         self._item_data: list[SubjectTask] = []
 
-        self._col_headers: list[str] = ["Completed", "Subject", "Task", "Deadline"]
+        self._col_headers: list[str] = ["Completed", "Subject", "Category", "Task", "Deadline"]
     
     def rowCount(self, /, parent=QModelIndex()):
         return len(self._item_data)
@@ -55,7 +59,13 @@ class TaskTodosTableModel(QAbstractTableModel):
                     return "Yes"
                 else:
                     return "No"
+            
+            if isinstance(value, int):
+                if index.column() == 2:
+                    return BuiltinCategories(value=value).name.capitalize().replace("_", " ")
                 
+                return str(value)
+            
             if value is None:
                 logger.debug("Received 'None' value at cell [%d, %d]", index.row(), index.column())
                 return ''
@@ -83,7 +93,7 @@ class TaskTodosTableModel(QAbstractTableModel):
         logger.debug("Cleared all tasks")
 
         for task in tasks:
-            display_data = [task.completed, task.subject, task.task, task.deadline]
+            display_data = [task.completed, task.subject, task.category, task.task, task.deadline]
             self._display_data.append(display_data)
 
             self._item_data.append(task)
@@ -92,14 +102,21 @@ class TaskTodosTableModel(QAbstractTableModel):
         self.endResetModel()
     
     def add_task(self, task: SubjectTask):
-        display_data = [task.completed, task.subject, task.task, task.deadline]
+        display_data = [task.completed, task.subject, task.category, task.task, task.deadline]
 
         self._item_data.append(task)
         self._display_data.append(display_data)
 
+        logger.debug("Added task '%s' to model", task.task)
         self.layoutChanged.emit()
     
     def delete_task(self, index: QModelIndex):
+        if not index.isValid():
+            return
+        
+        item_data = self._item_data[index.row()]
+        logger.debug("Deleted task '%s' at row %d", item_data.task, index.row())
+
         del self._item_data[index.row()]
         del self._display_data[index.row()]
 
@@ -109,7 +126,7 @@ class TaskTodosTableModel(QAbstractTableModel):
         if not index.isValid():
             return
 
-        display_data = [task.completed, task.subject, task.task, task.deadline]
+        display_data = [task.completed, task.subject, task.category, task.task, task.deadline]
         row = index.row()
 
         self._item_data[row] = task
@@ -118,6 +135,7 @@ class TaskTodosTableModel(QAbstractTableModel):
         top = self.index(row, 0)
         bottom = self.index(row, self.columnCount() - 1)
 
+        logger.debug("Updated task '%s' at row %d", task.task, index.row())
         self.dataChanged.emit(top, bottom)
 
 
@@ -129,6 +147,8 @@ class TaskTodosController(QObject):
         self.ui = mw_parent.ui
         self.app_data = mw_parent.app_data
 
+        self.model = TaskTodosTableModel(self)
+
         self.subject_ctrl: SubjectItemController = SubjectItemController(self)
         self.task_ctrl: TasksItemController = TasksItemController(self)
 
@@ -136,25 +156,18 @@ class TaskTodosController(QObject):
         self.setup()
 
     def setup(self):
-        self.ui.filterBySubjectComboBox.addItems(self.app_data.subjects)
-
-        self.subject_ctrl.subjectAdded.connect(self.subject_added)
-        self.subject_ctrl.subjectRemoved.connect(self.ui.filterBySubjectComboBox.removeItem)
+        self.ui.mainStackedWidget.setCurrentIndex(0)  # main page
 
         self.ui.actionAdd_subject.triggered.connect(self.subject_ctrl.add_subject)
         self.ui.actionRemove_subject.triggered.connect(self.subject_ctrl.remove_subject)
 
-        self.sort_filter_ctrl.reloadModelRequested.connect(self.task_ctrl.reload_model)
-        self.task_ctrl.updateSortAndFilterRequested.connect(self.sort_filter_ctrl.reload_tasks)
-        
-        self.ui.filterByAllSubjectsCheckBox.setChecked(True)
+        self.sort_filter_ctrl.sortFilterComplete.connect(self.task_ctrl.reload_model)
+        self.task_ctrl.taskAdded.connect(self.sort_filter_ctrl.task_added)
     
-    @Slot()
-    def subject_added(self, subject: str):
-        self.ui.filterBySubjectComboBox.addItem(subject)
-
-        self.ui.filterBySubjectComboBox.adjustSize()
-        self.ui.filterBySubjectComboBox.updateGeometry()
+    @Slot(SortAndFilterState)
+    def update_sort_filter_state(self, state: SortAndFilterState):
+        logger.debug("Received signal to update sort/filter state")
+        self.sort_filter_ctrl.change_state(state)
 
 
 class SubjectItemController(QObject):
@@ -214,7 +227,7 @@ class SubjectItemController(QObject):
 
 
 class TasksItemController(QObject):
-    updateSortAndFilterRequested = Signal()
+    taskAdded: Signal = Signal(SubjectTask)
 
     def __init__(self, ctrl_parent: 'TaskTodosController'):
         super().__init__(ctrl_parent)
@@ -225,7 +238,7 @@ class TasksItemController(QObject):
         self.app_data = ctrl_parent.app_data
 
         self.task_dialog: TaskInfoDialog = TaskInfoDialog(self)
-        self.model = TaskTodosTableModel(self)
+        self.model = ctrl_parent.model
 
         self.ui.tasksTableView.setModel(self.model)
         self.setup()
@@ -250,8 +263,8 @@ class TasksItemController(QObject):
 
     @Slot(list)
     def reload_model(self, tasks: list[SubjectTask]):
+        logger.info("Reloaded model with %d tasks", len(tasks))
         self.model.load_tasks(tasks)
-        logger.info("Reloaded model")
     
     @Slot()
     def add_task_triggered(self):
@@ -274,11 +287,10 @@ class TasksItemController(QObject):
             **task.model_dump()
         )
         self.app_data.tasks.append(new_task)
-
         self.app_data.save_settings()
-        self.model.add_task(new_task)
 
-        self.updateSortAndFilterRequested.emit()
+        logger.debug("Added new task, sending signal to add to model")
+        self.taskAdded.emit(new_task)
     
     @Slot()
     def remove_task_triggered(self):
@@ -303,7 +315,7 @@ class TasksItemController(QObject):
         self.app_data.save_settings()
 
         self.model.delete_task(index)
-        self.updateSortAndFilterRequested.emit()
+        self.ui.tasksTableView.clearSelection()
     
     @Slot()
     def complete_task_triggered(self):
@@ -354,11 +366,7 @@ class TasksItemController(QObject):
         data: SubjectTask = index.data(Qt.ItemDataRole.UserRole)
 
         edited_task = SubjectTask(
-            subject=task.subject,
-            deadline=task.deadline,
-            task=task.task,
-            completed=task.completed,
-            task_id=task.task_id
+            **task.model_dump()
         )
 
         data_index = self.app_data.tasks.index(data)
@@ -371,8 +379,8 @@ class TasksItemController(QObject):
 
 
 class SortAndFilterController(QObject):
-    reloadModelRequested = Signal(list)  # list[SubjectTask]
-
+    sortFilterComplete = Signal(list)  # list[SubjectTask]
+    
     def __init__(self, ctrl_parent: 'TaskTodosController'):
         super().__init__(ctrl_parent)
         self.ctrl_parent = ctrl_parent
@@ -381,79 +389,189 @@ class SortAndFilterController(QObject):
         self.ui = ctrl_parent.ui
         self.app_data = ctrl_parent.app_data
 
-        self._sort_filter_state: SortAndFilterState = SortAndFilterState()
+        self.model = ctrl_parent.model
+        self._sort_filter_state: SortAndFilterState = None
+
         self.setup()
 
     def setup(self):
-        self.ui.filterBySubjectComboBox.currentIndexChanged.connect(self.change_subject_filter)
-        self.ui.filterByAllSubjectsCheckBox.toggled.connect(self.filter_all_subjects_toggled)
+        self._sort_filter_state = SortAndFilterState(
+            sort_state=SortState(
+                sort_mode=SortingModeEnum.disabled,
+                sort_option=None
+            ),
+            filter_state=FilterState(
+                subject=False,
+                category=False,
+                deadline=DeadlineFilterState(
+                    enabled=False,
+                    not_before=datetime.now(timezone.utc),
+                    not_after=datetime.now(timezone.utc) + timedelta(weeks=12)
+                ),
+                completed=FilterCompletedTasksEnum.dont_filter
+            )
+        )
     
-        self.ui.sortByComboBox.currentIndexChanged.connect(self.change_sorting_rule)
-
-    @Slot(bool)
-    def filter_all_subjects_toggled(self, checked: bool):
-        if checked:
-            self._sort_filter_state.include_all_subjects = True
-            self._sort_filter_state.subject_filter = None
-
-            self.ui.filterBySubjectComboBox.setEnabled(False)
-        else:
-            subject_idx = self.ui.filterBySubjectComboBox.currentIndex()
-            if subject_idx != -1:
-                subject: str = self.app_data.subjects[subject_idx]
-            else:
-                subject: None = None
-            
-            self._sort_filter_state.subject_filter = subject
-            self._sort_filter_state.include_all_subjects = False
-
-            self.ui.filterBySubjectComboBox.setEnabled(True)
-        
-        self._emit_tasks()
+    def change_state(self, state: SortAndFilterState):
+        self._sort_filter_state = state
+        self._process_tasks()
     
-    @Slot(int)
-    def change_subject_filter(self, subject_idx: int):
-        subject: str = self.app_data.subjects[subject_idx]
-        self._sort_filter_state.subject_filter = subject
-
-        self._emit_tasks()
-    
-    @Slot(int)
-    def change_sorting_rule(self, index: int):
-        self._sort_filter_state.sort_filter = index
-        self._emit_tasks()
-    
-    @Slot()
-    def reload_tasks(self):
-        self._emit_tasks()
-    
-    def _emit_tasks(self):
+    def _process_tasks(self):
         state = self._sort_filter_state
 
-        if not state.include_all_subjects and state.subject_filter is not None:
-            tasks = self._get_tasks_by_subject(state.subject_filter)
-        else:
-            tasks = self.app_data.tasks
+        final_tasks = self._filter_tasks()
+        sorted_tasks = self._sort_tasks(final_tasks, state.sort_state.sort_mode)
 
-        match self._sort_filter_state.sort_filter:
-            case SortByComboBoxEnum.closest_to_deadline:
-                tasks_sorted = sorted(tasks, key=lambda task: task.deadline)
-            case SortByComboBoxEnum.farthest_to_deadline:
-                tasks_sorted = sorted(tasks, key=lambda task: task.deadline, reverse=True)
-            case SortByComboBoxEnum.subjects_a_to_z:
-                tasks_sorted = sorted(tasks, key=lambda task: task.subject)
-        
-        self.reloadModelRequested.emit(tasks_sorted)
+        self.sortFilterComplete.emit(sorted_tasks)
+        self.ui.statusbar.showMessage("Changed sorting/filtering options", timeout=5000)
     
-    def _get_tasks_by_subject(self, subject: str):
-        tasks: list[SubjectTask] = []
+    @Slot(SubjectTask)
+    def task_added(self, task: SubjectTask):
+        """Checks if the new task passes the filter rules before displaying."""
+        state = self._sort_filter_state
+        subject = state.filter_state.subject
 
-        for task in self.app_data.tasks:
+        if isinstance(subject, bool):
+            logger.debug("Passed subject filter due to value being a bool")
+        elif isinstance(subject, str):
             if task.subject != subject:
-                continue
-            tasks.append(task)
+                logger.debug("Failed subject filter, not adding to model")
+                return
+            
+            logger.debug("Passed subject filter")
         
-        return tasks
+        category = state.filter_state.category
+        if isinstance(category, bool):
+            logger.debug("Passed category filter due to value being a bool")
+        elif isinstance(category, int):
+            if task.category != category:
+                logger.debug("Failed category filter, not adding to model")
+                return
+            
+            logger.debug("Passed category filter")
+        
+        deadline = state.filter_state.deadline
+        if deadline.enabled:
+            if deadline.not_before < task.deadline < deadline.not_after:
+                logger.debug("Failed deadline filter, not adding to model")
+                return
+            
+            logger.debug("Passed deadline filter")
+        else:
+            logger.debug("Deadline filter not enabled")
+
+        filter_complete = state.filter_state.completed
+        if filter_complete == FilterCompletedTasksEnum.dont_filter:
+            logger.debug("Completed tasks filter not enabled")
+        elif filter_complete == FilterCompletedTasksEnum.complete:
+            logger.debug("Failed completed tasks filter, not adding to model")
+            return
+        elif filter_complete == FilterCompletedTasksEnum.incomplete:
+            logger.debug("Passed completed tasks filter")
+
+        logger.info("New task passed filter, adding to model")
+        self.model.add_task(task)
+
+    def _filter_tasks(self):
+        # TODO: Refactor function if it becomes hard to read/understand
+        state = self._sort_filter_state
+
+        final_tasks: list[SubjectTask] | None = None
+        subject = state.filter_state.subject
+
+        if isinstance(subject, bool):
+            # Do nothing when it's either "Include All" or "Don't include"
+            # Because the goal ends up the same:
+            # - Include All: Return the whole tasks list (match all subjects)
+            # - Don't Include: Don't use this filter and let the other filters handle it
+            logger.debug("Not filtering for subjects, value is '%s'", subject)
+        elif isinstance(subject, str):
+            final_tasks = [task for task in self.app_data.tasks if task.subject == subject]
+            logger.debug("Filtered for tasks with subject '%s', received %d tasks", subject, len(final_tasks))
+        
+        category = state.filter_state.category
+        if isinstance(category, bool):
+            # Do nothing, same reason as for subject
+            logger.debug("Not filtering for categories, value is '%s'", category)
+        elif isinstance(category, int):
+            if not final_tasks:
+                final_tasks = [*self.app_data.tasks]
+            
+            final_tasks = [task for task in final_tasks if task.category == category]
+            logger.debug("Filtered for tasks with category '%s', received %d tasks", category.name, len(final_tasks))
+
+        deadline = state.filter_state.deadline
+        if deadline.enabled:
+            if not final_tasks:
+                final_tasks = [*self.app_data.tasks]
+            
+            final_tasks = [
+                task for task in final_tasks
+                if deadline.not_before < task.deadline < deadline.not_after
+            ]
+            logger.debug(
+                "Filtered for tasks with datetime not before '%s' and not after '%s'" \
+                ", received %d tasks",
+                deadline.not_before, deadline.not_after, len(final_tasks)
+            )
+        else:
+            # Do nothing, same reason as for subject
+            logger.debug("Not filtering for deadlines, filter is disabled")
+        
+        filter_complete = state.filter_state.completed
+        if filter_complete == FilterCompletedTasksEnum.dont_filter:
+            logger.debug("Not filtering for completed tasks, filter is disabled")
+        elif filter_complete == FilterCompletedTasksEnum.complete:
+            if not final_tasks:
+                final_tasks = [*self.app_data.tasks]
+            
+            final_tasks = [task for task in final_tasks if task.completed]
+            logger.debug("Filtered for complete tasks, received %d tasks", len(final_tasks))
+        elif filter_complete == FilterCompletedTasksEnum.incomplete:
+            if not final_tasks:
+                final_tasks = [*self.app_data.tasks]
+            
+            final_tasks = [task for task in final_tasks if not task.completed]
+            logger.debug("Filtered for incomplete tasks, received %d tasks", len(final_tasks))
+
+        if final_tasks is None:
+            # Default to showing everything when no filter is applied
+            logger.debug("All filters are disabled, returning all tasks")
+            final_tasks = [*self.app_data.tasks]
+        
+        logger.debug("Retrieved %d entries after filtering", len(final_tasks))
+        return final_tasks
+    
+    def _sort_tasks(self, tasks: list[SubjectTask], sort_mode: SortingModeEnum):
+        if sort_mode == SortingModeEnum.disabled:
+            logger.debug("Sorting disabled, not sorting...")
+            return tasks
+        
+        tasks_sorted = []
+        sort_option = self._sort_filter_state.sort_state.sort_option
+        
+        if sort_mode == SortingModeEnum.deadline:    
+            match sort_option:
+                case DeadlineSortingEnum.closest_to_deadline:
+                    tasks_sorted = sorted(tasks, key=lambda task: task.deadline)
+                case DeadlineSortingEnum.farthest_to_deadline:
+                    tasks_sorted = sorted(tasks, key=lambda task: task.deadline, reverse=True)
+        elif sort_mode == SortingModeEnum.alphabetical:
+            match sort_option:
+                case AlphabeticalSortingEnum.a_to_z:
+                    tasks_sorted = sorted(tasks, key=lambda task: task.task)
+                case AlphabeticalSortingEnum.z_to_a:
+                    tasks_sorted = sorted(tasks, key=lambda task: task.task, reverse=True)
+        else:
+            logger.error("Invalid sort mode: '%s'", sort_mode)
+            return []
+
+        if not tasks_sorted:
+            logger.warning("Tasks were not sorted due to invalid sort option: %s", sort_option)
+            return []
+        
+        logger.debug("Tasks sorted using sort option '%s.%s'", sort_option.__class__.__name__, sort_option.name)
+        return tasks_sorted
 
 
 class TaskInfoDialog(QDialog):
@@ -470,10 +588,16 @@ class TaskInfoDialog(QDialog):
         self._data: SubjectTask | None = None
 
         self.ui.setupUi(self)
+        self.ui.categoryComboBox.addItems([
+            BuiltinCategories(val).name.capitalize().replace("_", " ")
+            for val in range(0, BuiltinCategories.custom + 1)
+        ])
 
     def reset_data(self, subjects: list[str], emit_as: EmitDialogInfoAs = EmitDialogInfoAs.add):
         self._emit_as = emit_as
         self._data = None
+
+        self.ui.categoryComboBox.setCurrentIndex(0)
 
         self.ui.subjectComboBox.clear()
         self.ui.subjectComboBox.addItems(subjects)
@@ -489,6 +613,8 @@ class TaskInfoDialog(QDialog):
         self.ui.taskPlainTextEdit.setPlainText(data.task)
 
         self.ui.subjectComboBox.setCurrentText(data.subject)
+        self.ui.categoryComboBox.setCurrentIndex(data.category)
+
         self._data = data
 
     def accept(self):
@@ -499,8 +625,11 @@ class TaskInfoDialog(QDialog):
         py_deadline: datetime = qt_deadline.toPython()
 
         aware_deadline: datetime = py_deadline.astimezone(timezone.utc)
+        category = self.ui.categoryComboBox.currentIndex()
+
         data = EditedSubjectTask(
             subject=subject,
+            category=category,
             deadline=aware_deadline,
             task=task
         )

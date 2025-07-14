@@ -71,7 +71,9 @@ jobs:
         with:
           files: dist_out/*
           tag_name: latest
-          body: "${{ github.event.head_commit.url }} ${{ github.event.head_commit.message }}"
+          body: "${{ github.event.head_commit.url }} `${{ github.event.head_commit.message }}`"
+          body_path: CHANGES.md
+          append_body: true
           name: Latest Build
           prerelease: true
         env:
