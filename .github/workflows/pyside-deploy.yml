@@ -41,7 +41,7 @@ jobs:
       - name: Upload Release Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: pyside6-deploy-binaries
+          name: pyside6-deploy-binaries-${{ matrix.os }}
           path: |
             dist_out
   latest-upload:
@@ -51,13 +51,20 @@ jobs:
     if: github.ref == 'refs/heads/main'
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Delete Previous Latest Release
         run: gh release delete latest --yes
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: Download Release Artifacts
         uses: actions/download-artifact@v4
         with:
-          name: pyside6-deploy-binaries
+          path: dist_out
+          pattern: pyside6-deploy-binaries-*
+          merge-multiple: true
 
       - name: Upload Release Assets (Latest)
         uses: softprops/action-gh-release@v2
