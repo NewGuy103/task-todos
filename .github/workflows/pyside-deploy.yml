@@ -55,7 +55,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Delete Previous Latest Release
-        run: gh release delete latest --yes
+        run: gh release delete latest --yes --cleanup-tag
         env:
           GH_TOKEN: ${{ github.token }}
 
@@ -71,6 +71,7 @@ jobs:
         with:
           files: dist_out/*
           tag_name: latest
+          body: "${{ github.event.head_commit.url }} ${{ github.event.head_commit.message }}"
           name: Latest Build
           prerelease: true
         env:
