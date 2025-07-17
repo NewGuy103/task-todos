@@ -76,6 +76,7 @@ jobs:
           append_body: true
           name: Latest Build
           prerelease: true
+          generate_release_notes: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   tag-upload:

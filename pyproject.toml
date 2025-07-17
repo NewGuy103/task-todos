@@ -1,7 +1,7 @@
 [project]
 name = "task-todos"
 version = "0.1.0"
-description = "Add your description here"
+description = "Simple To-Do application for desktop."
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
@@ -18,5 +18,12 @@ build = [
 dev = [
     "mkdocs>=1.6.1",
     "mkdocs-material>=9.6.15",
-    "pyinstaller>=6.14.2",
+    "ruff>=0.12.3",
 ]
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["F", "E", "W", "UP", "B", "S"]
+ignore = ["S101", "B011", "E501", "UP046", "UP007", "S110"]

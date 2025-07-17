@@ -70,12 +70,13 @@ class DeadlineFilterState(BaseModel):
 
 class FilterState(BaseModel):
     """Filter state.
-    
+
     `subject` and `category` being a boolean means either:
       - True: Include all subjects
       - False: Don't include any subjects from this filter
 
     """
+
     subject: str | bool
     category: BuiltinCategories | bool
     deadline: DeadlineFilterState

@@ -193,3 +193,4 @@ dist_out/
 
 # pyside6-android-deploy
 pyside6-wheels/
+!pysidedeploy.spec
